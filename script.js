@@ -21,7 +21,7 @@ function addBookToLibrary(title, author, pages, read){
 }
 
 function displayBooks() {
-    const container = document.querySelector("#books_container");
+    const container = document.querySelector("#books-container");
     container.innerHTML = '';
     
     for(let i = 0; i < myLibrary.length; i++) {
@@ -38,11 +38,11 @@ function displayBooks() {
                 ${book.read ? 'Read' : 'Not Read'}
             </p>
             <div class="book-actions">
-                <button class="toggle-read-btn" onclick="toggleReadStatus('${book.id}')">
-                    ${book.read ? 'Mark as Unread' : 'Mark as Read'}
+                <button class="custom-btn btn-3" onclick="toggleReadStatus('${book.id}')">
+                   <span>${book.read ? 'Mark as Unread' : 'Mark as Read'} </span>
                 </button>
-                <button class="remove-btn" onclick="removeBook('${book.id}')">
-                    Remove Book
+                <button class="custom-btn btn-3" onclick="removeBook('${book.id}')">
+                   <span>Remove Book</span>
                 </button>
             </div>
         `;
@@ -50,8 +50,51 @@ function displayBooks() {
         container.appendChild(bookCard);
     }
 }
+const dialog = document.querySelector("dialog");
 
-addBookToLibrary('x', 'x', 1, true);
-addBookToLibrary('y', 'y', 2, false);
-addBookToLibrary('z', 'z', 3, true);
-addBookToLibrary('a', 'a', 4, true);
+function toggleReadStatus(id) {
+    const book = myLibrary.find(book => book.id === id);
+    book.read = !book.read;
+    displayBooks();
+}
+
+function removeBook(id) {
+    const index = myLibrary.findIndex(book => book.id === id);
+    if (index !== -1) {
+        myLibrary.splice(index, 1);
+        displayBooks();
+    }
+}
+
+function addBook(){
+    const show = document.querySelector("#add-book");
+    dialog.showModal();
+}
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    const author = document.getElementById('author').value.trim();
+    const title = document.getElementById('title').value.trim();
+    const pages = document.getElementById('pages').value.trim();
+
+    if (!author || !title || !pages) {
+        e.preventDefault();
+        alert('Please fill in all required fields.');
+    }
+    else {
+        e.preventDefault();
+        const read = document.getElementById('read').checked;
+        addBookToLibrary(title, author, pages, read);
+        displayBooks();
+        this.reset();
+        dialog.close();
+    }
+});
+
+const cancelBtn = dialog.querySelector('button[value="cancel"]');
+const form = dialog.querySelector('form');
+
+cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // Prevent any default action
+    form.reset();       // Reset form fields
+    dialog.close();     // Close the dialog
+});
